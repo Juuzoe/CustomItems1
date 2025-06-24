@@ -1,23 +1,25 @@
 package com.example.customitems1.listeners;
 
-import com.example.customitems1.ConfigManager;
 import com.example.customitems1.CustomItems1;
+import com.example.customitems1.ConfigManager;
+
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.player.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
-import me.botsko.wildstacker.api.WildStackerAPI;
-import me.botsko.wildstacker.api.entities.StackedEntity;
-import org.bukkit.Bukkit;
+
+import com.bgsoftware.wildstacker.api.WildStackerAPI;
+import com.bgsoftware.wildstacker.api.objects.StackedItem;
+
+import net.brcdev.shopgui.ShopGuiPlusApi;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,33 +30,31 @@ public class MobDropHopperListener implements Listener {
 
     public MobDropHopperListener(CustomItems1 plugin) {
         this.plugin = plugin;
-        this.cfg    = plugin.getCfg();
+        this.cfg = plugin.getCfg();
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!cfg.isMobHopperEnabled()) return;
-                double taxPct      = cfg.getMobHopperTaxPercent();
-                List<String> loot  = cfg.getMobHopperLoot();
+                double taxPct = cfg.getMobHopperTaxPercent();
+                List<String> validTypes = cfg.getMobHopperItems();
 
                 for (Map.Entry<Location, UUID> entry : plugin.getMobHoppers().entrySet()) {
-                    Location loc     = entry.getKey();
-                    UUID     ownerId = entry.getValue();
+                    Location loc = entry.getKey();
+                    UUID ownerId = entry.getValue();
 
-                    var chunk = loc.getChunk();
+                    Chunk chunk = loc.getWorld().getChunkAt(loc);
                     double gross = 0;
 
-                    for (Item ent : chunk.getEntitiesByClass(Item.class)) {
-                        if (!loot.contains(ent.getItemStack().getType().name()))
-                            continue;
-                        if (WildStackerAPI.isStacked(ent)) {
-                            StackedEntity st = WildStackerAPI.getStackedEntity(ent);
-                            gross += ent.getItemStack().getAmount() * st.getAmount();
-                            ent.remove();
-                        } else {
-                            gross += ent.getItemStack().getAmount();
-                            ent.remove();
-                        }
+                    for (Item item : chunk.getEntitiesByClass(Item.class)) {
+                        if (!validTypes.contains(item.getItemStack().getType().name())) continue;
+
+                        StackedItem st = WildStackerAPI.getStackedItem(item);
+                        int amt = (st != null ? st.getAmount() : item.getItemStack().getAmount());
+
+                        double price = ShopGuiPlusApi.getItemStackPriceSell(null, item.getItemStack())
+                                     * amt;
+                        gross += price;
+                        item.remove();
                     }
 
                     if (gross > 0) {
@@ -62,30 +62,19 @@ public class MobDropHopperListener implements Listener {
                         double net = gross - tax;
 
                         SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerId);
-                        IslandBank bank   = sp.getIsland().getBank();
-                        bank.depositMoney(sp, net);
+                        IslandBank bank = sp.getIsland().getBank();
+                        bank.depositMoney(sp, BigDecimal.valueOf(net));
 
-                        Player owner = Bukkit.getPlayer(ownerId);
+                        Player owner = plugin.getServer().getPlayer(ownerId);
                         if (owner != null && owner.isOnline()) {
-                            owner.sendMessage(String.format(
-                                "§aMob-hopper sold §e%.2f §7(after §c%.2f tax)",
-                                net, tax
-                            ));
+                            owner.sendMessage(
+                                "§aMob‐Hopper sold for §e" + String.format("%.2f", net)
+                              + " §7(after §c" + String.format("%.2f", tax) + " tax)"
+                            );
                         }
                     }
                 }
             }
-        }.runTaskTimer(plugin, cfg.getMobHopperInterval(), cfg.getMobHopperInterval());
-    }
-
-    @EventHandler
-    public void onPlace(BlockPlaceEvent e) {
-        if (!cfg.isMobHopperEnabled()) return;
-        plugin.getMobHoppers().put(e.getBlockPlaced().getLocation(), e.getPlayer().getUniqueId());
-    }
-
-    @EventHandler
-    public void onBreak(BlockBreakEvent e) {
-        plugin.getMobHoppers().remove(e.getBlock().getLocation());
+        }.runTaskTimer(plugin, 200, 200);
     }
 }
