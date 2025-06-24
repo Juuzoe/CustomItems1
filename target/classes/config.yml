@@ -1,0 +1,29 @@
+crop-hopper:
+  enabled: true
+  loot:
+    - WHEAT
+    - CARROTS
+    - POTATOES
+  interval-seconds: 5
+  item-name: "Crop Hopper"
+
+mob-hopper:
+  enabled: true
+  loot:
+    - BONE
+    - ROTTEN_FLESH
+  interval-seconds: 5
+  item-name: "Mob Hopper"
+
+xp-hopper:
+  enabled: true
+  interval-seconds: 5
+  item-name: "XP Hopper"
+
+auto-sell:
+  enabled: true
+  tax-percent: 10
+  items:
+    DIAMOND: true
+    IRON_INGOT: true
+  chest-name: "AutoSell Chest"

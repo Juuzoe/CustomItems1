@@ -1,0 +1,26 @@
+name: CustomItems1
+main: com.example.customitems1.CustomItems1
+version: 1.0
+api-version: 1.21
+
+depend:
+  - SuperiorSkyblock2
+  - ShopGUIPlus
+  - Vault
+  - WildStacker
+
+softdepend:
+  - PlaceholderAPI
+  - ProtocolLib
+  - item-nbt-api-plugin
+
+commands:
+  ci:
+    description: CustomItems1 main command
+    usage: /ci give <autosell|crop|mob|xp> [amount]
+    aliases: [customitem]
+
+permissions:
+  customitems1.give:
+    description: Allows use of /ci give
+    default: op
