@@ -1,29 +1,29 @@
 package com.example.customitems1.listeners;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import com.example.customitems1.CustomItems1;
+import com.example.customitems1.ConfigManager;
 
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+
+import com.bgsoftware.wildstacker.api.WildStackerAPI;
+import com.bgsoftware.wildstacker.api.objects.StackedItem;
+
+import net.brcdev.shopgui.ShopGuiPlusApi;
+
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;               // ← add this
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.example.customitems1.ConfigManager;
-import com.example.customitems1.CustomItems1;
-
-import net.brcdev.shopgui.ShopGuiPlusApi;
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.UUID;
 
 public class MobDropHopperListener implements Listener {
     private final CustomItems1 plugin;
@@ -34,41 +34,35 @@ public class MobDropHopperListener implements Listener {
         this.cfg = plugin.getCfg();
 
         new BukkitRunnable() {
+            @Override
             public void run() {
-                List<String> mobItems = cfg.getMobHopperItems();
-                double taxPct = cfg.getMobHopperTaxPercent();
+                if (!cfg.isMobHopperEnabled()) return;
+                double taxPct    = cfg.getMobHopperTaxPercent();
+                Map<String, Object> sellItems = cfg.getMobHopperItems();
 
                 for (Map.Entry<Location, UUID> e : plugin.getMobHoppers().entrySet()) {
-                    Location loc = e.getKey();
-                    UUID ownerId = e.getValue();
-                    Chunk chunk = loc.getChunk();
+                    Location loc  = e.getKey();
+                    UUID ownerId  = e.getValue();
+                    Chunk chunk   = loc.getChunk();
 
-                    double gross = 0;
-                    for (var ent : chunk.getEntities()) {
-                        if (!(ent instanceof Item drop)) continue;
-                        ItemStack stack = drop.getItemStack();
-                        if (!mobItems.contains(stack.getType().name())) continue;
+                    for (Item drop : chunk.getEntitiesByClass(Item.class)) {
+                        if (!WildStackerAPI.isStacked(drop)) continue;
+                        StackedItem st    = WildStackerAPI.getStackedItem(drop);
+                        ItemStack base    = drop.getItemStack();
+                        String mat        = base.getType().name();
+                        if (!sellItems.containsKey(mat)) continue;
 
-                        double price = ShopGuiPlusApi.getItemStackPriceSell(null, stack) * stack.getAmount();
-                        gross += price;
-                        drop.remove();
-                    }
-
-                    if (gross > 0) {
-                        double tax = gross * taxPct / 100.0;
-                        double net = gross - tax;
+                        int count         = st.getAmount();
+                        double unitPrice  = ShopGuiPlusApi.getItemStackPriceSell(null, base);
+                        double gross      = count * unitPrice;
+                        double tax        = gross * taxPct / 100.0;
+                        double net        = gross - tax;
 
                         SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerId);
-                        IslandBank bank = sp.getIsland().getIslandBank();
-                        bank.depositMoney(sp, BigDecimal.valueOf(net));
+                        sp.getIsland().getBank()
+                          .depositMoney(sp, BigDecimal.valueOf(net));
 
-                        Player owner = Bukkit.getPlayer(ownerId);
-                        if (owner != null && owner.isOnline()) {
-                            owner.sendMessage("§aMob Hopper sold §e" +
-                              String.format("%.2f", net) +
-                              " §7(after §c" + String.format("%.2f", tax) + " tax)"
-                            );
-                        }
+                        drop.remove();
                     }
                 }
             }
@@ -77,11 +71,14 @@ public class MobDropHopperListener implements Listener {
 
     @EventHandler
     public void onPlace(BlockPlaceEvent e) {
+        if (!cfg.isMobHopperEnabled()) return;
         var meta = e.getItemInHand().getItemMeta();
-        if (meta != null && meta.hasDisplayName()
-         && meta.getDisplayName().contains("Mob Drop Hopper")) {
+        if (meta != null
+         && meta.hasDisplayName()
+         && meta.getDisplayName().equals(cfg.getMobHopperName())) {
             plugin.getMobHoppers()
-                  .put(e.getBlockPlaced().getLocation(), e.getPlayer().getUniqueId());
+                  .put(e.getBlockPlaced().getLocation(),
+                       e.getPlayer().getUniqueId());
         }
     }
 

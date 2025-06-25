@@ -1,9 +1,13 @@
 package com.example.customitems1.listeners;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import com.example.customitems1.CustomItems1;
+import com.example.customitems1.ConfigManager;
+
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+
+import net.brcdev.shopgui.ShopGuiPlusApi;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,13 +21,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.example.customitems1.ConfigManager;
-import com.example.customitems1.CustomItems1;
-
-import net.brcdev.shopgui.ShopGuiPlusApi;
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.UUID;
 
 public class AutoSellChestListener implements Listener {
     private final CustomItems1 plugin;
@@ -35,42 +35,47 @@ public class AutoSellChestListener implements Listener {
 
         // every 10 seconds
         new BukkitRunnable() {
+            @Override
             public void run() {
                 if (!cfg.isAutoSellEnabled()) return;
-                List<String> sellItems = cfg.getAutoSellItems();
-                double taxPct = cfg.getAutoSellTaxPercent();
+                double taxPct    = cfg.getAutoSellTaxPercent();
+                Map<String, Object> sellItems = cfg.getAutoSellItems();
 
                 for (Map.Entry<Location, UUID> e : plugin.getAutoSellChests().entrySet()) {
                     Location loc = e.getKey();
                     UUID ownerId = e.getValue();
-
                     if (!(loc.getBlock().getState() instanceof Chest chest)) continue;
-                    Inventory inv = chest.getInventory();
 
+                    Inventory inv = chest.getInventory();
                     double gross = 0;
+
                     for (ItemStack stack : inv.getContents()) {
-                        if (stack == null) continue;
-                        if (!sellItems.contains(stack.getType().name())) continue;
-                        double price = ShopGuiPlusApi.getItemStackPriceSell(null, stack) * stack.getAmount();
-                        gross += price;
-                        inv.remove(stack);
+                        if (stack == null)                        continue;
+                        if (!sellItems.containsKey(stack.getType().name())) continue;
+                        try {
+                            double price = ShopGuiPlusApi
+                                .getItemStackPriceSell(null, stack)
+                                * stack.getAmount();
+                            gross += price;
+                            inv.remove(stack);
+                        } catch (Exception ignore) {}
                     }
 
-                    if (gross > 0) {
-                        double tax = gross * taxPct / 100.0;
-                        double net = gross - tax;
+                    if (gross <= 0) continue;
 
-                        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerId);
-                        IslandBank bank = sp.getIsland().getIslandBank();
-                        bank.depositMoney(sp, BigDecimal.valueOf(net));
+                    double tax = gross * taxPct / 100.0;
+                    double net = gross - tax;
 
-                        Player owner = Bukkit.getPlayer(ownerId);
-                        if (owner != null && owner.isOnline()) {
-                            owner.sendMessage(
-                              "§aAuto-sold §e" + String.format("%.2f", net)
-                            + " §7(after §c" + String.format("%.2f", tax) + " tax)"
-                            );
-                        }
+                    SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerId);
+                    IslandBank bank = sp.getIsland().getBank();
+                    bank.depositMoney(sp, BigDecimal.valueOf(net));
+
+                    Player owner = Bukkit.getPlayer(ownerId);
+                    if (owner != null && owner.isOnline()) {
+                        owner.sendMessage(
+                            "§aAuto-sold §e" + String.format("%.2f", net)
+                          + " §7(after §c" + String.format("%.2f", tax) + " tax)"
+                        );
                     }
                 }
             }
@@ -79,11 +84,14 @@ public class AutoSellChestListener implements Listener {
 
     @EventHandler
     public void onPlace(BlockPlaceEvent e) {
+        if (!cfg.isAutoSellEnabled()) return;
         var meta = e.getItemInHand().getItemMeta();
-        if (meta != null && meta.hasDisplayName()
-         && meta.getDisplayName().contains("Auto-Sell Chest")) {
+        if (meta != null
+         && meta.hasDisplayName()
+         && meta.getDisplayName().equals(cfg.getAutoSellName())) {
             plugin.getAutoSellChests()
-                  .put(e.getBlockPlaced().getLocation(), e.getPlayer().getUniqueId());
+                  .put(e.getBlockPlaced().getLocation(),
+                       e.getPlayer().getUniqueId());
         }
     }
 
