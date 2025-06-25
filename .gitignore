@@ -1,4 +1,14 @@
-/libraries/
+# Maven target directory
 /target/
-/.vscode/
-/*.iml
+
+# IDE files
+.vscode/
+*.iml
+*.class
+
+# Local libraries (since you’re keeping them in /libraries/)
+libraries/
+
+# Logs, OS, JARs
+*.log
+*.jar

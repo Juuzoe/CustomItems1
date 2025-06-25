@@ -1,119 +1,87 @@
 package com.example.customitems1.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.example.customitems1.CustomItems1;
+import com.example.customitems1.ConfigManager;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import net.brcdev.shopgui.ShopGuiPlusApi;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.example.customitems1.ConfigManager;
-import com.example.customitems1.CustomItems1;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
-public class GiveCommand implements CommandExecutor {
+public class GiveCommand implements CommandExecutor, TabCompleter {
     private final CustomItems1 plugin;
     private final ConfigManager cfg;
 
     public GiveCommand(CustomItems1 plugin) {
         this.plugin = plugin;
-        this.cfg    = plugin.getCfg();
+        this.cfg = plugin.getCfg();
     }
 
     @Override
-    public boolean onCommand(CommandSender sender,
-                             Command cmd,
-                             String label,
-                             String[] args) {
-        if (args.length < 2 || !args[0].equalsIgnoreCase("give")) {
-            sender.sendMessage(ChatColor.RED + "Usage: /ci give <autosell|crop|mob|xp> [amount]");
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!(sender instanceof Player p)) return false;
+        if (args.length < 2) {
+            p.sendMessage(ChatColor.RED + "Usage: /ci give <autosell|crop|mob|xp> [amount]");
             return true;
         }
 
         String type = args[1].toLowerCase();
-        int amount = 1;
-        if (args.length >= 3) {
-            try {
-                amount = Integer.parseInt(args[2]);
-            } catch (NumberFormatException e) {
-                sender.sendMessage(ChatColor.RED + "Invalid number: " + args[2]);
-                return true;
-            }
-        }
-
-        ItemStack stack;
-        String displayName;
-        List<String> lore = new ArrayList<>();
-
+        int amount = args.length >= 3 ? Integer.parseInt(args[2]) : 1;
+        ItemStack item;
         switch (type) {
             case "autosell":
-            case "autosellchest":
-                stack = new ItemStack(Material.CHEST, amount);
-                displayName = ChatColor.GOLD + cfg.getAutoSellName();
-                lore.add(ChatColor.GRAY + "Auto-sells these items:");
-                for (String mat : cfg.getAutoSellItems()) {
-                    lore.add(ChatColor.WHITE + " • " + mat);
-                }
-                lore.add(ChatColor.GRAY + "Tax: " + cfg.getAutoSellTaxPercent() + "%");
+                item = buildNamedItem(Material.CHEST, cfg.getAutoSellName(), "Sells configurable items");
                 break;
-
             case "crop":
-            case "crophopper":
-                stack = new ItemStack(Material.HOPPER, amount);
-                displayName = ChatColor.GREEN + cfg.getCropHopperName();
-                lore.add(ChatColor.GRAY + "Collects crops in the chunk:");
-                for (String mat : cfg.getCropHopperLoot()) {
-                    lore.add(ChatColor.WHITE + " • " + mat);
-                }
+                item = buildNamedItem(Material.HOPPER, cfg.getCropHopperName(), cfg.getCropHopperItems());
                 break;
-
             case "mob":
-            case "mobhopper":
-                stack = new ItemStack(Material.HOPPER, amount);
-                displayName = ChatColor.DARK_RED + cfg.getMobHopperName();
-                lore.add(ChatColor.GRAY + "Collects mob drops in the chunk:");
-                for (String mat : cfg.getMobHopperLoot()) {
-                    lore.add(ChatColor.WHITE + " • " + mat);
-                }
+                item = buildNamedItem(Material.HOPPER, cfg.getMobHopperName(), cfg.getMobHopperItems());
                 break;
-
             case "xp":
-            case "xphopper":
-                stack = new ItemStack(Material.HOPPER, amount);
-                displayName = ChatColor.AQUA + cfg.getXpHopperName();
-                lore.add(ChatColor.GRAY + "Collects XP orbs and bottles them.");
+                item = buildNamedItem(Material.HOPPER, cfg.getXpHopperName(),
+                    List.of("Converts XP to bottle every chunk"));
                 break;
-
             default:
-                sender.sendMessage(ChatColor.RED + "Unknown type: " + type);
+                p.sendMessage(ChatColor.RED + "Unknown type.");
                 return true;
         }
 
-        // Apply meta
-        ItemMeta meta = stack.getItemMeta();
-        meta.setDisplayName(displayName);
-        meta.setLore(lore);
-        stack.setItemMeta(meta);
-
-        // Give to player or drop at spawn
-        if (sender instanceof Player p) {
-            p.getInventory().addItem(stack);
-        } else {
-            plugin.getServer()
-                  .getWorlds().get(0)
-                  .dropItemNaturally(
-                    plugin.getServer().getWorlds().get(0).getSpawnLocation(),
-                    stack
-                  );
-        }
-
-        sender.sendMessage(
-          ChatColor.GREEN + "Gave " + amount + "× " + ChatColor.RESET + displayName
-        );
+        item.setAmount(amount);
+        p.getInventory().addItem(item);
+        p.sendMessage(ChatColor.GREEN + "Gave you " + amount + "x " + ChatColor.YELLOW + item.getItemMeta().getDisplayName());
         return true;
+    }
+
+    private ItemStack buildNamedItem(Material mat, String name, List<String> loreLines) {
+        ItemStack stack = new ItemStack(mat);
+        ItemMeta meta = stack.getItemMeta();
+        meta.setDisplayName(name);
+        List<String> lore = new ArrayList<>();
+        for (String L : loreLines) lore.add(ChatColor.GRAY + L);
+        meta.setLore(lore);
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        stack.setItemMeta(meta);
+        return stack;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender cs, Command cmd, String alias, String[] args) {
+        if (args.length == 2) {
+            return List.of("autosell", "crop", "mob", "xp");
+        }
+        return Collections.emptyList();
     }
 }
