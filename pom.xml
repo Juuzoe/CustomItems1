@@ -11,22 +11,35 @@
   <packaging>jar</packaging>
 
   <properties>
-    <spigot.version>1.21.5-R0.1-SNAPSHOT</spigot.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <spigot.version>1.21.5-R0.1-SNAPSHOT</spigot.version>
   </properties>
 
   <repositories>
+    <!-- Spigot snapshots for the Spigot API -->
+    <repository>
+      <id>spigot-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+
+    <!-- BG-Software’s own API repo (SuperiorSkyblock2 + WildStacker) -->
     <repository>
       <id>bg-repo</id>
       <url>https://repo.bg-software.com/repository/api/</url>
       <snapshots><enabled>true</enabled></snapshots>
       <releases><enabled>true</enabled></releases>
     </repository>
+
+    <!-- BRCDev’s repo for ShopGUIPlus -->
+    <repository>
+      <id>brcdev</id>
+      <url>https://repo.brcdev.net/repository/maven-public/</url>
+    </repository>
   </repositories>
 
   <dependencies>
-    <!-- Spigot API -->
+    <!-- your server API (provided by the server at runtime) -->
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
@@ -34,7 +47,7 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- SuperiorSkyblock2 API -->
+    <!-- SuperiorSkyblock2 -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>SuperiorSkyblockAPI</artifactId>
@@ -42,48 +55,58 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- System-scope local jars -->
+    <!-- ShopGUIPlus -->
     <dependency>
       <groupId>net.brcdev</groupId>
       <artifactId>shopgui-plus</artifactId>
       <version>1.106.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/ShopGUIPlus-1.106.1.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
+
+    <!-- Vault -->
     <dependency>
       <groupId>net.milkbowl.vault</groupId>
       <artifactId>vault</artifactId>
       <version>1.9.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/Vault.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
-    <!-- remove WildStacker until you have the correct API jar -->
+
+    <!-- PlaceholderAPI -->
     <dependency>
-      <groupId>me.clip.placeholderapi</groupId>
+      <groupId>me.clip</groupId>
       <artifactId>placeholderapi</artifactId>
       <version>2.11.6</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/PlaceholderAPI-2.11.6.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
+
+    <!-- ProtocolLib -->
     <dependency>
       <groupId>com.comphenix.protocol</groupId>
-      <artifactId>protocollib</artifactId>
+      <artifactId>ProtocolLib</artifactId>
       <version>4.8.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/ProtocolLib.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
+
+    <!-- Item-NBT-API -->
     <dependency>
       <groupId>de.tr7zw</groupId>
       <artifactId>item-nbt-api-plugin</artifactId>
       <version>2.15.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/item-nbt-api-plugin-2.15.0.jar</systemPath>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- WildStacker API -->
+    <dependency>
+      <groupId>com.bgsoftware</groupId>
+      <artifactId>wildstacker-api</artifactId>
+      <version>2025.1</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <!-- Java 17 -->
+      <!-- compile for Java 17 -->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
@@ -91,27 +114,6 @@
           <release>17</release>
         </configuration>
       </plugin>
-      <!-- Shade local system jars into fat-jar -->
-      <plugin>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.0</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals><goal>shade</goal></goals>
-            <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <artifactSet>
-                <excludes>
-                  <exclude>org.spigotmc:spigot-api</exclude>
-                  <exclude>com.bgsoftware:SuperiorSkyblockAPI</exclude>
-                </excludes>
-              </artifactSet>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
-
 </project>
