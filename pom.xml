@@ -12,12 +12,20 @@
 
   <properties>
     <spigot.version>1.21.5-R0.1-SNAPSHOT</spigot.version>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.release>17</maven.compiler.release>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>bg-repo</id>
+      <url>https://repo.bg-software.com/repository/api/</url>
+      <snapshots><enabled>true</enabled></snapshots>
+      <releases><enabled>true</enabled></releases>
+    </repository>
+  </repositories>
+
   <dependencies>
-    <!-- Spigot API (compile-only) -->
+    <!-- Spigot API -->
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
@@ -25,25 +33,23 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- SuperiorSkyblock2 API (system-scoped, compile-only) -->
+    <!-- SuperiorSkyblock2 API (installed locally) -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>SuperiorSkyblockAPI</artifactId>
       <version>2025.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/SuperiorSkyblockAPI-2025.1.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
 
-    <!-- WildStacker API (system-scoped, compile-only) -->
+    <!-- WildStacker API (installed locally) -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>wildstacker-api</artifactId>
       <version>2025.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/WildStacker-2025.1.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
 
-    <!-- ShopGUIPlus plugin JAR -->
+    <!-- System-scoped JARs in your libraries/ folder -->
     <dependency>
       <groupId>net.brcdev</groupId>
       <artifactId>shopgui-plus</artifactId>
@@ -51,8 +57,6 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/libraries/ShopGUIPlus-1.106.1.jar</systemPath>
     </dependency>
-
-    <!-- Vault plugin JAR -->
     <dependency>
       <groupId>net.milkbowl.vault</groupId>
       <artifactId>vault</artifactId>
@@ -60,8 +64,6 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/libraries/Vault.jar</systemPath>
     </dependency>
-
-    <!-- PlaceholderAPI plugin JAR -->
     <dependency>
       <groupId>me.clip.placeholderapi</groupId>
       <artifactId>placeholderapi</artifactId>
@@ -69,8 +71,6 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/libraries/PlaceholderAPI-2.11.6.jar</systemPath>
     </dependency>
-
-    <!-- ProtocolLib plugin JAR -->
     <dependency>
       <groupId>com.comphenix.protocol</groupId>
       <artifactId>protocollib</artifactId>
@@ -78,8 +78,6 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/libraries/ProtocolLib.jar</systemPath>
     </dependency>
-
-    <!-- Item-NBT-API plugin JAR -->
     <dependency>
       <groupId>de.tr7zw</groupId>
       <artifactId>item-nbt-api-plugin</artifactId>
@@ -96,10 +94,11 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <release>17</release>
+          <release>${maven.compiler.release}</release>
         </configuration>
       </plugin>
-      <!-- (optional) shade your own classes if you still need a fat‐jar -->
+
+      <!-- Shade all non-provided deps into the fat JAR -->
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.5.0</version>
@@ -111,6 +110,7 @@
               <createDependencyReducedPom>false</createDependencyReducedPom>
               <artifactSet>
                 <excludes>
+                  <!-- leave provided APIs out of the final JAR -->
                   <exclude>org.spigotmc:spigot-api</exclude>
                   <exclude>com.bgsoftware:SuperiorSkyblockAPI</exclude>
                   <exclude>com.bgsoftware:wildstacker-api</exclude>
