@@ -2,21 +2,20 @@ package com.example.customitems1.listeners;
 
 import com.example.customitems1.CustomItems1;
 import com.example.customitems1.ConfigManager;
+
+// SuperiorSkyblock2 API
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.player.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+
+// Bukkit
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.math.BigDecimal;
-import java.util.Map;
 import java.util.UUID;
 
 public class XPHopperListener implements Listener {

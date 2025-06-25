@@ -2,12 +2,17 @@ package com.example.customitems1.listeners;
 
 import com.example.customitems1.CustomItems1;
 import com.example.customitems1.ConfigManager;
+
+// SuperiorSkyblock2 API
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.player.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
-import com.bgsoftware.wildstacker.api.WildStackerAPI;
-import com.bgsoftware.wildstacker.api.wrappers.StackedEntity;
+
+// ShopGUIPlus
 import net.brcdev.shopgui.ShopGuiPlusApi;
+
+// Bukkit
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -21,6 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
 import java.util.UUID;
+
 
 public class MobDropHopperListener implements Listener {
     private final CustomItems1 plugin;
