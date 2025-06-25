@@ -12,10 +12,12 @@
 
   <properties>
     <spigot.version>1.21.5-R0.1-SNAPSHOT</spigot.version>
-    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
   </properties>
 
   <repositories>
+    <!-- (optional) if you still have any plugins in bgsoftware repo -->
     <repository>
       <id>bg-repo</id>
       <url>https://repo.bg-software.com/repository/api/</url>
@@ -25,7 +27,7 @@
   </repositories>
 
   <dependencies>
-    <!-- Spigot API -->
+    <!-- Spigot API pulled from remote, not bundled -->
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
@@ -33,7 +35,7 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- SuperiorSkyblock2 API (installed locally) -->
+    <!-- SuperiorSkyblock, now provided from your local Maven (~/.m2) -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>SuperiorSkyblockAPI</artifactId>
@@ -41,7 +43,7 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- WildStacker API (installed locally) -->
+    <!-- WildStacker API, also provided locally -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>wildstacker-api</artifactId>
@@ -49,7 +51,7 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- System-scoped JARs in your libraries/ folder -->
+    <!-- The rest stay system-scoped -->
     <dependency>
       <groupId>net.brcdev</groupId>
       <artifactId>shopgui-plus</artifactId>
@@ -89,16 +91,16 @@
 
   <build>
     <plugins>
-      <!-- Java 17 compiler -->
+      <!-- Compile with Java 17 -->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <release>${maven.compiler.release}</release>
+          <release>17</release>
         </configuration>
       </plugin>
 
-      <!-- Shade all non-provided deps into the fat JAR -->
+      <!-- Bundle system jars except provided ones -->
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.5.0</version>
@@ -110,7 +112,7 @@
               <createDependencyReducedPom>false</createDependencyReducedPom>
               <artifactSet>
                 <excludes>
-                  <!-- leave provided APIs out of the final JAR -->
+                  <!-- don’t include provided dependencies -->
                   <exclude>org.spigotmc:spigot-api</exclude>
                   <exclude>com.bgsoftware:SuperiorSkyblockAPI</exclude>
                   <exclude>com.bgsoftware:wildstacker-api</exclude>
@@ -122,4 +124,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>
