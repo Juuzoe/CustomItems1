@@ -1,80 +1,39 @@
 package com.example.customitems1.listeners;
 
-import com.example.customitems1.CustomItems1;
-import com.example.customitems1.ConfigManager;
-
-// SuperiorSkyblock2 API
-import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
-
-// Bukkit
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 
-// Java
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.UUID;
+import com.example.customitems1.CustomItems1;
+import com.example.customitems1.XPHopper;
 
 public class XPHopperListener implements Listener {
+
     private final CustomItems1 plugin;
-    private final ConfigManager cfg;
+    private final FileConfiguration cfg;
 
     public XPHopperListener(CustomItems1 plugin) {
         this.plugin = plugin;
         this.cfg = plugin.getCfg();
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!cfg.isXpHopperEnabled()) return;
-
-                double rate = cfg.getXpSellRate();
-                double taxPct = cfg.getXpHopperTaxPercent();
-
-                for (Map.Entry<Location, UUID> e : plugin.getXpHoppers().entrySet()) {
-                    Location loc = e.getKey();
-                    UUID ownerId = e.getValue();
-                    Chunk chunk = loc.getWorld().getChunkAt(loc);
-
-                    for (Entity ent : chunk.getEntities()) {
-                        if (!(ent instanceof ExperienceOrb orb)) continue;
-                        int xp = orb.getExperience();
-                        double gross = xp * rate;
-                        double tax = gross * taxPct / 100.0;
-                        double net = gross - tax;
-
-                        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerId);
-                        IslandBank bank = sp.getIsland().getBank();
-                        bank.depositMoney(sp, BigDecimal.valueOf(net));
-
-                        orb.remove();
-                    }
-                }
-            }
-        }.runTaskTimer(plugin, 200L, 200L);
     }
 
     @EventHandler
-    public void onPlace(BlockPlaceEvent e) {
-        if (!cfg.isXpHopperEnabled()) return;
-        if (e.getItemInHand().hasItemMeta()
-         && cfg.getXpHopperName().equals(e.getItemInHand().getItemMeta().getDisplayName())) {
-            plugin.getXpHoppers().put(e.getBlockPlaced().getLocation(), e.getPlayer().getUniqueId());
-            e.getPlayer().sendMessage("§aRegistered an XP-hopper!");
+    public void onExpChange(PlayerExpChangeEvent event) {
+        // 1) Find the chunk‐center key
+        Location chunkCenter = event.getPlayer()
+                .getLocation()
+                .getChunk()
+                .getBlock(0, 0, 0)
+                .getLocation();
+
+        // 2) Lookup our XP hopper stub
+        XPHopper hopper = plugin.getXpHoppers().get(chunkCenter);
+        if (hopper != null) {
+            // TODO: implement XP capture logic here
+            // e.g. absorb the XP into your hopper and zero it out:
+            event.setAmount(0);
         }
-    }
-
-    @EventHandler
-    public void onBreak(BlockBreakEvent e) {
-        plugin.getXpHoppers().remove(e.getBlock().getLocation());
     }
 }

@@ -1,8 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="
-           http://maven.apache.org/POM/4.0.0
-           http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.example</groupId>
@@ -11,9 +11,8 @@
   <packaging>jar</packaging>
 
   <properties>
+    <java.version>17</java.version>
     <spigot.version>1.21.5-R0.1-SNAPSHOT</spigot.version>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -25,25 +24,23 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- SuperiorSkyblock2 API (system-scoped) -->
+    <!-- SuperiorSkyblock2 API (installed locally via mvn install:install-file) -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>SuperiorSkyblockAPI</artifactId>
       <version>2025.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/SuperiorSkyblockAPI-2025.1.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
 
-    <!-- WildStacker plugin JAR as its own API -->
+    <!-- WildStacker API (installed locally via mvn install:install-file) -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>wildstacker-api</artifactId>
       <version>2025.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/WildStacker-2025.1.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
 
-    <!-- all the rest of your system-scoped libs -->
+    <!-- Other third-party jars in libraries/ -->
     <dependency>
       <groupId>net.brcdev</groupId>
       <artifactId>shopgui-plus</artifactId>
@@ -51,51 +48,28 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/libraries/ShopGUIPlus-1.106.1.jar</systemPath>
     </dependency>
-    <dependency>
-      <groupId>net.milkbowl.vault</groupId>
-      <artifactId>vault</artifactId>
-      <version>1.9.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/Vault.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>me.clip.placeholderapi</groupId>
-      <artifactId>placeholderapi</artifactId>
-      <version>2.11.6</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/PlaceholderAPI-2.11.6.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>com.comphenix.protocol</groupId>
-      <artifactId>protocollib</artifactId>
-      <version>4.8.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/ProtocolLib.jar</systemPath>
-    </dependency>
-    <dependency>
-      <groupId>de.tr7zw</groupId>
-      <artifactId>item-nbt-api-plugin</artifactId>
-      <version>2.15.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/item-nbt-api-plugin-2.15.0.jar</systemPath>
-    </dependency>
+    <!-- Vault, PlaceholderAPI, ProtocolLib, NBT-API, etc. -->
   </dependencies>
 
   <build>
     <plugins>
-      <!-- compile with Java 17 -->
+      <!-- Java 17 compiler -->
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <release>17</release>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
 
-      <!-- shade everything except the provided APIs -->
+      <!-- Shade without bundling provided/system APIs -->
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>3.2.4</version>
         <executions>
           <execution>
             <phase>package</phase>
