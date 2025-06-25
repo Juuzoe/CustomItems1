@@ -3,52 +3,46 @@
          xsi:schemaLocation="
            http://maven.apache.org/POM/4.0.0
            http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
 
+  <modelVersion>4.0.0</modelVersion>
   <groupId>com.example</groupId>
   <artifactId>CustomItems1</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <spigot.version>1.21.5-R0.1-SNAPSHOT</spigot.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <spigot.version>1.21.5-R0.1-SNAPSHOT</spigot.version>
   </properties>
 
   <repositories>
     <repository>
       <id>bg-repo</id>
-      <name>BG-Software API Repo</name>
       <url>https://repo.bg-software.com/repository/api/</url>
-      <releases><enabled>true</enabled></releases>
       <snapshots><enabled>true</enabled></snapshots>
+      <releases><enabled>true</enabled></releases>
     </repository>
   </repositories>
 
   <dependencies>
-    <!-- Provided by server -->
+    <!-- Spigot API -->
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
       <version>${spigot.version}</version>
       <scope>provided</scope>
     </dependency>
+
+    <!-- SuperiorSkyblock2 API -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>SuperiorSkyblockAPI</artifactId>
       <version>2025.1</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>com.bgsoftware</groupId>
-      <artifactId>WildStackerAPI</artifactId>
-      <version>2025.1</version>
-      <scope>provided</scope>
-    </dependency>
 
-    <!-- Local JARs (system scope) -->
+    <!-- System-scope local jars -->
     <dependency>
       <groupId>net.brcdev</groupId>
       <artifactId>shopgui-plus</artifactId>
@@ -63,6 +57,7 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/libraries/Vault.jar</systemPath>
     </dependency>
+    <!-- remove WildStacker until you have the correct API jar -->
     <dependency>
       <groupId>me.clip.placeholderapi</groupId>
       <artifactId>placeholderapi</artifactId>
@@ -88,13 +83,16 @@
 
   <build>
     <plugins>
+      <!-- Java 17 -->
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
-        <configuration><release>17</release></configuration>
+        <configuration>
+          <release>17</release>
+        </configuration>
       </plugin>
+      <!-- Shade local system jars into fat-jar -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.5.0</version>
         <executions>
@@ -107,7 +105,6 @@
                 <excludes>
                   <exclude>org.spigotmc:spigot-api</exclude>
                   <exclude>com.bgsoftware:SuperiorSkyblockAPI</exclude>
-                  <exclude>com.bgsoftware:WildStackerAPI</exclude>
                 </excludes>
               </artifactSet>
             </configuration>
@@ -116,4 +113,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

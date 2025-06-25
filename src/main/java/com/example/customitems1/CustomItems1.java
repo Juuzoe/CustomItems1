@@ -1,10 +1,6 @@
 package com.example.customitems1;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.example.customitems1.commands.GiveCommand;
@@ -13,10 +9,16 @@ import com.example.customitems1.listeners.CropHopperListener;
 import com.example.customitems1.listeners.MobDropHopperListener;
 import com.example.customitems1.listeners.XPHopperListener;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import org.bukkit.Location;
+
 public class CustomItems1 extends JavaPlugin {
+
     private ConfigManager cfg;
 
-    // track owner of each placed block
+    // chest → owner UUID
     private final Map<Location, UUID> autoSellChests = new HashMap<>();
     private final Map<Location, UUID> cropHoppers    = new HashMap<>();
     private final Map<Location, UUID> mobHoppers     = new HashMap<>();
@@ -24,16 +26,16 @@ public class CustomItems1 extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // load or create config
+        saveDefaultConfig();
         this.cfg = new ConfigManager(this);
 
-        // register listeners
-        getServer().getPluginManager().registerEvents(new AutoSellChestListener(this), this);
-        getServer().getPluginManager().registerEvents(new CropHopperListener(this), this);
-        getServer().getPluginManager().registerEvents(new MobDropHopperListener(this), this);
-        getServer().getPluginManager().registerEvents(new XPHopperListener(this), this);
-
-        // register command executor for /ci
-        getCommand("ci").setExecutor(new GiveCommand(this));
+        // register commands & listeners
+        this.getCommand("ci").setExecutor(new GiveCommand(this));
+        Bukkit.getPluginManager().registerEvents(new AutoSellChestListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new CropHopperListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new MobDropHopperListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new XPHopperListener(this), this);
     }
 
     public ConfigManager getCfg() {

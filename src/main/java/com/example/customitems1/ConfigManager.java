@@ -1,75 +1,59 @@
 package com.example.customitems1;
 
-import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 public class ConfigManager {
 
     private final FileConfiguration cfg;
 
-    public ConfigManager(File dataFolder) {
-        File file = new File(dataFolder, "config.yml");
-        if (!file.exists()) {
-            dataFolder.mkdirs();
-            // assume plugin savesResource("config.yml", false) elsewhere
-        }
-        this.cfg = YamlConfiguration.loadConfiguration(file);
+    public ConfigManager(CustomItems1 plugin) {
+        this.cfg = plugin.getConfig();
+
+        // ensure defaults
+        cfg.addDefault("autosell.enabled", true);
+        cfg.addDefault("autosell.items", List.of("DIAMOND", "IRON_INGOT"));
+        cfg.addDefault("autosell.tax-percent", 0.0);
+        cfg.addDefault("crophopper.items", List.of("WHEAT", "CARROT"));
+        cfg.addDefault("crophopper.tax-percent", 0.0);
+        cfg.addDefault("mobhopper.items", List.of("BONE", "STRING"));
+        cfg.addDefault("mobhopper.tax-percent", 0.0);
+        cfg.addDefault("xphopper.sell-rate", 1.0);
+        cfg.addDefault("xphopper.tax-percent", 0.0);
+
+        cfg.options().copyDefaults(true);
+        plugin.saveConfig();
     }
 
     public boolean isAutoSellEnabled() {
-        return cfg.getBoolean("autosell.enabled", true);
+        return cfg.getBoolean("autosell.enabled");
     }
-    public String getAutoSellName() {
-        return cfg.getString("autosell.name", "§eAutoSell Chest");
-    }
-    @SuppressWarnings("unchecked")
-    public Map<String,Object> getAutoSellItems() {
-        return (Map<String,Object>)cfg.getConfigurationSection("autosell.items").getValues(false);
+    public List<String> getAutoSellItems() {
+        return cfg.getStringList("autosell.items");
     }
     public double getAutoSellTaxPercent() {
-        return cfg.getDouble("autosell.tax-percent", 0.0);
+        return cfg.getDouble("autosell.tax-percent");
     }
 
-    public boolean isCropHopperEnabled() {
-        return cfg.getBoolean("hoppers.crop.enabled", true);
-    }
-    public String getCropHopperName() {
-        return cfg.getString("hoppers.crop.name", "§aCrop Hopper");
-    }
     public List<String> getCropHopperItems() {
-        return cfg.getStringList("hoppers.crop.loot");
+        return cfg.getStringList("crophopper.items");
     }
     public double getCropHopperTaxPercent() {
-        return cfg.getDouble("hoppers.crop.tax-percent", 0.0);
+        return cfg.getDouble("crophopper.tax-percent");
     }
 
-    public boolean isMobHopperEnabled() {
-        return cfg.getBoolean("hoppers.mob.enabled", true);
-    }
-    public String getMobHopperName() {
-        return cfg.getString("hoppers.mob.name", "§cMob Drop Hopper");
-    }
     public List<String> getMobHopperItems() {
-        return cfg.getStringList("hoppers.mob.loot");
+        return cfg.getStringList("mobhopper.items");
     }
     public double getMobHopperTaxPercent() {
-        return cfg.getDouble("hoppers.mob.tax-percent", 0.0);
+        return cfg.getDouble("mobhopper.tax-percent");
     }
 
-    public boolean isXpHopperEnabled() {
-        return cfg.getBoolean("hoppers.xp.enabled", true);
-    }
-    public String getXpHopperName() {
-        return cfg.getString("hoppers.xp.name", "§bXP Hopper");
-    }
     public double getXpSellRate() {
-        return cfg.getDouble("hoppers.xp.sell-rate", 1.0);
+        return cfg.getDouble("xphopper.sell-rate");
     }
     public double getXpHopperTaxPercent() {
-        return cfg.getDouble("hoppers.xp.tax-percent", 0.0);
+        return cfg.getDouble("xphopper.tax-percent");
     }
 }
