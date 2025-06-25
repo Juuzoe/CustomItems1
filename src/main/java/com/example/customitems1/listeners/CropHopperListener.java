@@ -2,17 +2,15 @@ package com.example.customitems1.listeners;
 
 import com.example.customitems1.CustomItems1;
 import com.example.customitems1.ConfigManager;
-
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-
+import com.bgsoftware.superiorskyblock.api.player.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
-import com.bgsoftware.wildstacker.api.objects.StackedItem;
-
+import com.bgsoftware.wildstacker.api.wrappers.StackedEntity;
 import net.brcdev.shopgui.ShopGuiPlusApi;
-
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,7 +19,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,48 +34,43 @@ public class CropHopperListener implements Listener {
             @Override
             public void run() {
                 if (!cfg.isCropHopperEnabled()) return;
-                double taxPct = cfg.getCropHopperTaxPercent();
-                Map<String, Object> sellItems = cfg.getCropHopperItems();
+
+                Map<String, Double> sellItems = cfg.getCropHopperItems();
 
                 for (Map.Entry<Location, UUID> e : plugin.getCropHoppers().entrySet()) {
-                    Location loc  = e.getKey();
-                    UUID ownerId  = e.getValue();
-                    Chunk chunk   = loc.getChunk();
+                    Location loc = e.getKey();
+                    UUID ownerId = e.getValue();
+                    Chunk chunk = loc.getWorld().getChunkAt(loc);
 
-                    for (Item drop : chunk.getEntitiesByClass(Item.class)) {
-                        if (!WildStackerAPI.isStacked(drop)) continue;
-                        StackedItem st    = WildStackerAPI.getStackedItem(drop);
-                        ItemStack base    = drop.getItemStack();
-                        String mat        = base.getType().name();
-                        if (!sellItems.containsKey(mat)) continue;
+                    for (Entity ent : chunk.getEntities()) {
+                        if (!(ent instanceof Item drop)) continue;
+                        ItemStack stack = drop.getItemStack();
+                        String key = stack.getType().name();
+                        if (!sellItems.containsKey(key)) continue;
 
-                        int count         = st.getAmount();
-                        double unitPrice  = ShopGuiPlusApi.getItemStackPriceSell(null, base);
-                        double gross      = count * unitPrice;
-                        double tax        = gross * taxPct / 100.0;
-                        double net        = gross - tax;
+                        if (WildStackerAPI.isStackedEntity(ent)) {
+                            StackedEntity st = WildStackerAPI.getStackedEntity(ent);
+                            stack.setAmount(st.getAmount());
+                        }
 
                         SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerId);
-                        sp.getIsland().getBank()
-                          .depositMoney(sp, BigDecimal.valueOf(net));
+                        IslandBank bank = sp.getIsland().getBank();
+                        bank.depositItem(sp, stack);
 
                         drop.remove();
                     }
                 }
             }
-        }.runTaskTimer(plugin, 200, 200);
+        }.runTaskTimer(plugin, 200L, 200L);
     }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent e) {
         if (!cfg.isCropHopperEnabled()) return;
-        var meta = e.getItemInHand().getItemMeta();
-        if (meta != null
-         && meta.hasDisplayName()
-         && meta.getDisplayName().equals(cfg.getCropHopperName())) {
-            plugin.getCropHoppers()
-                  .put(e.getBlockPlaced().getLocation(),
-                       e.getPlayer().getUniqueId());
+        if (e.getItemInHand().hasItemMeta()
+         && cfg.getCropHopperName().equals(e.getItemInHand().getItemMeta().getDisplayName())) {
+            plugin.getCropHoppers().put(e.getBlockPlaced().getLocation(), e.getPlayer().getUniqueId());
+            e.getPlayer().sendMessage("§aRegistered a crop-hopper!");
         }
     }
 

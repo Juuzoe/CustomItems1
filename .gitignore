@@ -1,14 +1,23 @@
-# Maven target directory
+# Compiled output
 /target/
 
 # IDE files
+/.idea/
+/*.iml
+.project
+.classpath
+.settings/
+
+# VSCode
 .vscode/
-*.iml
-*.class
 
-# Local libraries (since you’re keeping them in /libraries/)
-libraries/
-
-# Logs, OS, JARs
+# Maven wrapper logs
+mvnw*
 *.log
-*.jar
+
+# Libraries (we install via Maven instead)
+/libraries/
+
+# OS cruft
+.DS_Store
+Thumbs.db

@@ -2,13 +2,10 @@ package com.example.customitems1.listeners;
 
 import com.example.customitems1.CustomItems1;
 import com.example.customitems1.ConfigManager;
-
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.player.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
-
 import net.brcdev.shopgui.ShopGuiPlusApi;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Chest;
@@ -33,65 +30,61 @@ public class AutoSellChestListener implements Listener {
         this.plugin = plugin;
         this.cfg = plugin.getCfg();
 
-        // every 10 seconds
+        // every 10s (200 ticks)
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (!cfg.isAutoSellEnabled()) return;
-                double taxPct    = cfg.getAutoSellTaxPercent();
-                Map<String, Object> sellItems = cfg.getAutoSellItems();
+
+                double taxPct = cfg.getAutoSellTaxPercent();
+                Map<String, Double> sellItems = cfg.getAutoSellItems();
 
                 for (Map.Entry<Location, UUID> e : plugin.getAutoSellChests().entrySet()) {
                     Location loc = e.getKey();
                     UUID ownerId = e.getValue();
+
                     if (!(loc.getBlock().getState() instanceof Chest chest)) continue;
-
                     Inventory inv = chest.getInventory();
-                    double gross = 0;
 
+                    double gross = 0;
                     for (ItemStack stack : inv.getContents()) {
-                        if (stack == null)                        continue;
-                        if (!sellItems.containsKey(stack.getType().name())) continue;
+                        if (stack == null) continue;
+                        String key = stack.getType().name();
+                        if (!sellItems.containsKey(key)) continue;
                         try {
-                            double price = ShopGuiPlusApi
-                                .getItemStackPriceSell(null, stack)
-                                * stack.getAmount();
+                            double price = ShopGuiPlusApi.getItemStackPriceSell(null, stack)
+                                         * stack.getAmount();
                             gross += price;
                             inv.remove(stack);
-                        } catch (Exception ignore) {}
+                        } catch (Exception ignored) {}
                     }
 
-                    if (gross <= 0) continue;
+                    if (gross > 0) {
+                        double tax = gross * taxPct / 100.0;
+                        double net = gross - tax;
+                        SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerId);
+                        IslandBank bank = sp.getIsland().getBank();
+                        bank.depositMoney(sp, BigDecimal.valueOf(net));
 
-                    double tax = gross * taxPct / 100.0;
-                    double net = gross - tax;
-
-                    SuperiorPlayer sp = SuperiorSkyblockAPI.getPlayer(ownerId);
-                    IslandBank bank = sp.getIsland().getBank();
-                    bank.depositMoney(sp, BigDecimal.valueOf(net));
-
-                    Player owner = Bukkit.getPlayer(ownerId);
-                    if (owner != null && owner.isOnline()) {
-                        owner.sendMessage(
-                            "§aAuto-sold §e" + String.format("%.2f", net)
-                          + " §7(after §c" + String.format("%.2f", tax) + " tax)"
-                        );
+                        Player owner = Bukkit.getPlayer(ownerId);
+                        if (owner != null && owner.isOnline()) {
+                            owner.sendMessage(
+                              "§aAuto-sold §e" + String.format("%.2f", net)
+                            + " §7(after §c" + String.format("%.2f", tax) + " tax)");
+                        }
                     }
                 }
             }
-        }.runTaskTimer(plugin, 200, 200);
+        }.runTaskTimer(plugin, 200L, 200L);
     }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent e) {
         if (!cfg.isAutoSellEnabled()) return;
-        var meta = e.getItemInHand().getItemMeta();
-        if (meta != null
-         && meta.hasDisplayName()
-         && meta.getDisplayName().equals(cfg.getAutoSellName())) {
-            plugin.getAutoSellChests()
-                  .put(e.getBlockPlaced().getLocation(),
-                       e.getPlayer().getUniqueId());
+        if (e.getItemInHand().hasItemMeta()
+         && cfg.getAutoSellName().equals(e.getItemInHand().getItemMeta().getDisplayName())) {
+            plugin.getAutoSellChests().put(e.getBlockPlaced().getLocation(), e.getPlayer().getUniqueId());
+            e.getPlayer().sendMessage("§aRegistered an auto-sell chest!");
         }
     }
 
