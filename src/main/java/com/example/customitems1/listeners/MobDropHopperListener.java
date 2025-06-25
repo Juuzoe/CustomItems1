@@ -1,29 +1,29 @@
 package com.example.customitems1.listeners;
 
-import com.example.customitems1.CustomItems1;
-import com.example.customitems1.ConfigManager;
-
-import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
-
-import net.brcdev.shopgui.ShopGuiPlusApi;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;               // ← add this
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.example.customitems1.ConfigManager;
+import com.example.customitems1.CustomItems1;
+
+import net.brcdev.shopgui.ShopGuiPlusApi;
 
 public class MobDropHopperListener implements Listener {
     private final CustomItems1 plugin;
