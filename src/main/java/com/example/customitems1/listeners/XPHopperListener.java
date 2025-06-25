@@ -11,11 +11,17 @@ import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 // Bukkit
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
+// Java
+import java.math.BigDecimal;
+import java.util.Map;
 import java.util.UUID;
 
 public class XPHopperListener implements Listener {
