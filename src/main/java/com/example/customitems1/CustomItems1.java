@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.example.customitems1.commands.GiveCommand;  // adjust imports
+import com.example.customitems1.commands.GiveCommand;
 import com.example.customitems1.listeners.AutoSellChestListener;
 import com.example.customitems1.listeners.CropHopperListener;
 import com.example.customitems1.listeners.MobDropHopperListener;
@@ -32,7 +32,7 @@ public class CustomItems1 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MobDropHopperListener(this), this);
         getServer().getPluginManager().registerEvents(new XPHopperListener(this), this);
 
-        // register your command
+        // register command executor for /ci
         getCommand("ci").setExecutor(new GiveCommand(this));
     }
 

@@ -72,7 +72,7 @@ public class AutoSellChestListener implements Listener {
                         if (owner != null && owner.isOnline()) {
                             owner.sendMessage(
                               "§aAuto-sold §e" + String.format("%.2f", net)
-                            + " §7(after §c" + String.format("%.2f",tax)+" tax)"
+                            + " §7(after §c" + String.format("%.2f", tax) + " tax)"
                             );
                         }
                     }

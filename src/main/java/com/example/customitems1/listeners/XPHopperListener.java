@@ -58,7 +58,7 @@ public class XPHopperListener implements Listener {
                         if (owner != null && owner.isOnline()) {
                             owner.sendMessage(
                               "§aXP‐Hopper sold for §e" + String.format("%.2f", net)
-                            + " §7(after §c" + String.format("%.2f",tax)+" tax)"
+                            + " §7(after §c" + String.format("%.2f", tax) + " tax)"
                             );
                         }
                     }
