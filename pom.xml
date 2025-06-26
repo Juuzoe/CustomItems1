@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>com.example</groupId>
   <artifactId>CustomItems1</artifactId>
   <version>1.0-SNAPSHOT</version>
@@ -12,11 +11,21 @@
 
   <properties>
     <java.version>17</java.version>
-    <spigot.version>1.21.5-R0.1-SNAPSHOT</spigot.version>
+    <spigot.version>1.20.1-R0.1-SNAPSHOT</spigot.version>
+    <superiorSkyblock.version>2025.1</superiorSkyblock.version>
+    <wildstacker.version>2025.1</wildstacker.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>spigot-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+  </repositories>
+
   <dependencies>
-    <!-- Spigot API -->
+    <!-- Spigot API (provided at runtime) -->
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
@@ -24,23 +33,23 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- SuperiorSkyblock2 API (installed locally via mvn install:install-file) -->
+    <!-- SuperiorSkyblock2 API (installed in your local ~/.m2) -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>SuperiorSkyblockAPI</artifactId>
-      <version>2025.1</version>
+      <version>${superiorSkyblock.version}</version>
       <scope>provided</scope>
     </dependency>
 
-    <!-- WildStacker API (installed locally via mvn install:install-file) -->
+    <!-- WildStacker API (installed in your local ~/.m2) -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>wildstacker-api</artifactId>
-      <version>2025.1</version>
+      <version>${wildstacker.version}</version>
       <scope>provided</scope>
     </dependency>
 
-    <!-- Other third-party jars in libraries/ -->
+    <!-- ShopGUIPlus (system-scoped against your libraries folder) -->
     <dependency>
       <groupId>net.brcdev</groupId>
       <artifactId>shopgui-plus</artifactId>
@@ -48,12 +57,11 @@
       <scope>system</scope>
       <systemPath>${project.basedir}/libraries/ShopGUIPlus-1.106.1.jar</systemPath>
     </dependency>
-    <!-- Vault, PlaceholderAPI, ProtocolLib, NBT-API, etc. -->
   </dependencies>
 
   <build>
     <plugins>
-      <!-- Java 17 compiler -->
+      <!-- Java 17 compiler settings -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -61,31 +69,8 @@
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
-          <encoding>UTF-8</encoding>
+          <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
-      </plugin>
-
-      <!-- Shade without bundling provided/system APIs -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.4</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals><goal>shade</goal></goals>
-            <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <artifactSet>
-                <excludes>
-                  <exclude>org.spigotmc:spigot-api</exclude>
-                  <exclude>com.bgsoftware:SuperiorSkyblockAPI</exclude>
-                  <exclude>com.bgsoftware:wildstacker-api</exclude>
-                </excludes>
-              </artifactSet>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
