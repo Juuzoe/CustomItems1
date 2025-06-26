@@ -1,16 +1,31 @@
+// File: src/main/java/com/example/customitems1/XPHopper.java
 package com.example.customitems1;
 
+import java.util.List;
+
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Hopper;
+import org.bukkit.inventory.ItemStack;
 
 public class XPHopper {
-    private final Location location;
-    // TODO: accumulate XP and store in bottles
+    private final Hopper hopper;
 
-    public XPHopper(Location location) {
-        this.location = location;
+    public XPHopper(BlockState state) {
+        this.hopper = (Hopper) state;
     }
 
-    public Location getLocation() {
-        return location;
+    public void addItem(ItemStack item) {
+        hopper.getInventory().addItem(item);
+    }
+
+    public void addAll(List<ItemStack> items) {
+        for (ItemStack i : items) addItem(i);
+    }
+
+    public static Location originOf(BlockState state) {
+        Chunk c = state.getLocation().getChunk();
+        return c.getBlock(0, 0, 0).getLocation();
     }
 }

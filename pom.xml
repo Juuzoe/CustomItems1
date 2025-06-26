@@ -12,8 +12,6 @@
   <properties>
     <java.version>17</java.version>
     <spigot.version>1.20.1-R0.1-SNAPSHOT</spigot.version>
-    <superiorSkyblock.version>2025.1</superiorSkyblock.version>
-    <wildstacker.version>2025.1</wildstacker.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -25,7 +23,7 @@
   </repositories>
 
   <dependencies>
-    <!-- Spigot API (provided at runtime) -->
+    <!-- Spigot API -->
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
@@ -33,35 +31,34 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- SuperiorSkyblock2 API (installed in your local ~/.m2) -->
+    <!-- SuperiorSkyblock2 API (installed locally) -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>SuperiorSkyblockAPI</artifactId>
-      <version>${superiorSkyblock.version}</version>
+      <version>2025.1</version>
       <scope>provided</scope>
     </dependency>
 
-    <!-- WildStacker API (installed in your local ~/.m2) -->
+    <!-- WildStacker API (installed locally) -->
     <dependency>
       <groupId>com.bgsoftware</groupId>
       <artifactId>wildstacker-api</artifactId>
-      <version>${wildstacker.version}</version>
+      <version>2025.1</version>
       <scope>provided</scope>
     </dependency>
 
-    <!-- ShopGUIPlus (system-scoped against your libraries folder) -->
+    <!-- ShopGUIPlus API (installed locally) -->
     <dependency>
-      <groupId>net.brcdev</groupId>
-      <artifactId>shopgui-plus</artifactId>
+      <groupId>net.brcdev.shopgui</groupId>
+      <artifactId>shopgui-plus-api</artifactId>
       <version>1.106.1</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/libraries/ShopGUIPlus-1.106.1.jar</systemPath>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <!-- Java 17 compiler settings -->
+      <!-- Java 17 compiler -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

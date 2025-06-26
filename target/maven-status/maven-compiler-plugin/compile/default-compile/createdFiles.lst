@@ -1,12 +1,1 @@
-com\example\customitems1\CropHopper.class
-com\example\customitems1\ConfigManager.class
-com\example\customitems1\MobDropHopper.class
-com\example\customitems1\XPHopper.class
-com\example\customitems1\AutoSellChest.class
-com\example\customitems1\CustomItems1.class
-com\example\customitems1\listeners\AutoSellChestListener.class
-com\example\customitems1\listeners\CropHopperListener.class
-com\example\customitems1\listeners\MobDropHopperListener.class
-com\example\customitems1\commands\GiveCommand.class
 com\example\customitems1\listeners\HopperPlacementListener.class
-com\example\customitems1\listeners\XPHopperListener.class

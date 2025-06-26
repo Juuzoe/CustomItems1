@@ -1,29 +1,32 @@
-crop-hopper:
-  enabled: true
-  loot:
+# File: src/main/resources/config.yml
+
+# MobDropHopper: which mob-drop items to collect
+mobhopper:
+  # Bukkit Material names, or '*' for any
+  allowed_materials:
+    - '*'
+
+# CropHopper: which fully-grown crop drops to collect
+crophopper:
+  allowed_materials:
     - WHEAT
-    - CARROTS
-    - POTATOES
-  interval-seconds: 5
-  item-name: "Crop Hopper"
+    - CARROT
+    - POTATO
+    - BEETROOT
 
-mob-hopper:
-  enabled: true
-  loot:
-    - BONE
-    - ROTTEN_FLESH
-  interval-seconds: 5
-  item-name: "Mob Hopper"
+# AutoSellChest: which chest contents to sell
+autosell:
+  allowed_materials:
+    - DIAMOND
+    - EMERALD
+    - GOLD_INGOT
+    # - '*'   # uncomment this line to sell everything
+  tax: 0.50
+  shop-category: 'default'
+  interval: 10
 
-xp-hopper:
-  enabled: true
-  interval-seconds: 5
-  item-name: "XP Hopper"
-
-auto-sell:
-  enabled: true
-  tax-percent: 10
-  items:
-    DIAMOND: true
-    IRON_INGOT: true
-  chest-name: "AutoSell Chest"
+# XPHopper: which XP-containing items (e.g. bottles) to fill
+xphopper:
+  allowed_items:
+    - EXPERIENCE_BOTTLE
+    - POTION  # if you want custom-potion behavior
