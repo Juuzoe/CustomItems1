@@ -1,0 +1,30 @@
+CustomItems1 — build requirements & libraries
+
+This is a Spigot/Bukkit (Minecraft server) plugin written in Java.
+
+Build requirements
+
+You’ll need a JDK that matches the Minecraft version you’re targeting. It is built for 1.21+ so use at least JDK 17.
+
+The project is built with Maven, so mvn -v should work.
+
+Runtime requirements
+
+Run it on a Spigot/Paper server that matches your target version (Paper is what I’d use for local testing).
+
+Libraries / dependencies
+
+PlaceholderAPI-2.11.6.jar
+ProtocolLib.jar
+ShopGUIPlus-1.106.1.jar
+SuperiorSkyblock2-2025.1-b526.jar
+SuperiorSkyblockAPI-2025.1.jar
+Vault.jar
+WildStacker-2025.1.jar
+item-nbt-api-plugin-2.15.0.jar
+
+I used manual dowloading for these libraries as I had a problem with dowloading bbg via Maven. You can try dealing with it if you'd modify it further.
+
+
+
+
