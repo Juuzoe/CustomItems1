@@ -6,6 +6,12 @@ This was written for a Skyblock-style server environment, where custom items are
 
 If you wish to reuse any of the code, please do so. There are function calls for different plugins, so you can implement them in your own plugin, although you should change the Maven references, as here it was written from jars.
 
+Plugin adds:
+Auto Mob Hopper - collects every item from a chunk. Integrated with WildStacker for spawners.
+Auto Item Hopper - same logic but with resources (sugar cane, cactus, etc.)
+Auto XP Hopper - same logic but with XP. Places it in the bottles and allows to claim millions of XP in the same bottle.
+Auto Sell Chest - sells all of the items that the chest holds every ten seconds. Uses SS2 and Vault economy for it. 
+
 ## Integrations
 
 The plugin was developed around these plugins and their APIs. Depending on how you run the server, some may be required and others may just unlock extra features:
