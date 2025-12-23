@@ -9,8 +9,11 @@ If you wish to reuse any of the code, please do so. There are function calls for
 Plugin adds:
 
 Auto Mob Hopper - collects every item from a chunk. Integrated with WildStacker for spawners.
+
 Auto Item Hopper - same logic but with resources (sugar cane, cactus, etc.)
+
 Auto XP Hopper - same logic but with XP. Places it in the bottles and allows to claim millions of XP in the same bottle.
+
 Auto Sell Chest - sells all of the items that the chest holds every ten seconds. Uses SS2 and Vault economy for it. 
 
 ## Integrations
